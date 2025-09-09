@@ -1,0 +1,64 @@
+{
+  "title": "بانک سوال گوارش و کبد",
+  "final_id": "10100000000",
+  "children": [
+    {
+      "title": "1- درد شکمی و سوء جذب",
+      "final_id": "10101000000",
+      "children": [
+        {
+          "title": "1) تشخیص و سوء جذب",
+          "final_id": "10101010000",
+          "annotations": [
+            { "type": "Q", "final_id": "20101010010", "correctAnswer": "1" },
+            { "type": "E", "final_id": "30101010011" },
+            { "type": "Q", "final_id": "20101010020", "correctAnswer": "1" },
+            { "type": "Q", "final_id": "20101010030", "correctAnswer": "1" },
+            { "type": "Q", "final_id": "20101010040", "correctAnswer": "4" },
+            { "type": "Q", "final_id": "20101010050", "correctAnswer": "2" },
+            { "type": "E", "final_id": "30101010051" },
+            { "type": "E", "final_id": "30101010052" },
+            { "type": "E", "final_id": "30101010053" }
+          ]
+        },
+        {
+          "title": "2) چگونگی برخورد با سوء جذب",
+          "final_id": "10101020000",
+          "annotations": [
+            { "type": "Q", "final_id": "20101020060", "correctAnswer": "2" },
+            { "type": "E", "final_id": "30101020061" },
+            { "type": "E", "final_id": "30101020062" },
+            { "type": "Q", "final_id": "20101020070", "correctAnswer": "2" },
+            { "type": "E", "final_id": "30101020071" },
+            { "type": "E", "final_id": "30101020072" },
+            { "type": "Q", "final_id": "20101020080", "correctAnswer": "3" },
+            { "type": "E", "final_id": "30101020081" },
+            { "type": "F", "final_id": "40101020001" },
+            { "type": "F", "final_id": "40101020002" }
+          ]
+        },
+        {
+            "title": "3) بیماری سلیاک",
+            "final_id": "10101030000",
+            "annotations": [
+                { "type": "Q", "final_id": "20101030090", "correctAnswer": "4" },
+                { "type": "E", "final_id": "30101030091" },
+                { "type": "E", "final_id": "30101030092" },
+                { "type": "E", "final_id": "30101030093" },
+                { "type": "E", "final_id": "30101030094" }
+            ]
+        }
+      ]
+    },
+    {
+      "title": "2- اسهال و یبوست",
+      "final_id": "10102000000",
+      "children": []
+    },
+    {
+      "title": "3- خونریزی های گوارشی",
+      "final_id": "10103000000",
+      "children": []
+    }
+  ]
+}
