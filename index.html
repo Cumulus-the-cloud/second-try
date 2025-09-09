@@ -230,8 +230,118 @@
                     </button>
                 </div>
             </div>
+
+            <!-- My Exams View -->
+            <div id="my-exams-view" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">My Exams</h1>
+                    <button id="create-exam-btn" class="px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition">
+                        <i class="fas fa-plus mr-2"></i>
+                        Create New Exam
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Placeholder Exam Card -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Cardiology Review</h3>
+                        <p class="text-sm text-gray-500 mb-4">Custom Template | 5 Sessions</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+                        </div>
+                        <p class="text-xs text-right text-gray-500">2/5 sessions complete</p>
+                    </div>
+                    <!-- End Placeholder -->
+                </div>
+            </div>
         </main>
     </div>
     <script type="module" src="src/js/app.js"></script>
+
+    <!-- Exam Wizard Modal -->
+    <div id="exam-wizard-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+        <div class="relative mx-auto p-8 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Create New Exam</h3>
+                <button id="exam-wizard-close-btn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times fa-2x"></i>
+                </button>
+            </div>
+            <div id="exam-wizard-entry-view">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <!-- Custom Template Card -->
+                    <div class="p-6 border rounded-lg hover:shadow-xl hover:border-blue-500 cursor-pointer transition">
+                        <i class="fas fa-sliders-h fa-3x text-blue-500 mb-4"></i>
+                        <h4 class="text-lg font-bold mb-2">Custom Template</h4>
+                        <p class="text-sm text-gray-600">Build a reusable template with smart pooling and detailed session control.</p>
+                    </div>
+                    <!-- Original Exam Card -->
+                    <div class="p-6 border rounded-lg hover:shadow-xl hover:border-purple-500 cursor-pointer transition">
+                        <i class="fas fa-pencil-alt fa-3x text-purple-500 mb-4"></i>
+                        <h4 class="text-lg font-bold mb-2">Original Exam</h4>
+                        <p class="text-sm text-gray-600">Create your own questions from scratch for a single-session exam.</p>
+                    </div>
+                    <!-- Fast Template Card -->
+                    <div id="fast-template-card" class="p-6 border rounded-lg hover:shadow-xl hover:border-green-500 cursor-pointer transition">
+                        <i class="fas fa-rocket fa-3x text-green-500 mb-4"></i>
+                        <h4 class="text-lg font-bold mb-2">Fast Template</h4>
+                        <p class="text-sm text-gray-600">Quickly generate an exam from one book with smart defaults.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fast Template Wizard View -->
+            <div id="fast-template-wizard-view" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <button id="wizard-back-btn" class="text-sm font-semibold text-blue-600 hover:underline">
+                        &larr; Back to Exam Types
+                    </button>
+                    <h3 class="text-2xl font-bold">Fast Template Wizard</h3>
+                    <div class="w-24"></div> <!-- Spacer -->
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label for="fast-book-select" class="block text-sm font-medium text-gray-700">1. Select a Book</label>
+                        <select id="fast-book-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option>Gastroenterology & Hepatology</option>
+                            <option>Cardiology</option>
+                        </select>
+                    </div>
+                    <div>
+                        <p class="block text-sm font-medium text-gray-700">2. Select Seasons</p>
+                        <div class="mt-2 space-y-2 border border-gray-200 rounded-md p-4 max-h-48 overflow-y-auto">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                <span class="ml-3 text-sm text-gray-700">1- درد شکمی و سوء جذب</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                <span class="ml-3 text-sm text-gray-700">2- اسهال و یبوست</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="fast-timing-mode" class="block text-sm font-medium text-gray-700">3. Timing Mode</label>
+                        <select id="fast-timing-mode" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option>Time per Exam</option>
+                            <option>Time per Question</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="fast-questions-per-session" class="block text-sm font-medium text-gray-700">4. Questions per Session</label>
+                        <input type="number" id="fast-questions-per-session" value="20" class="mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="fast-template-name" class="block text-sm font-medium text-gray-700">5. Template Name</label>
+                        <input type="text" id="fast-template-name" placeholder="e.g., 'Cardiology Weekly Review'" class="mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                </div>
+                <div class="mt-8 text-right">
+                    <button class="px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition">
+                        Create Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

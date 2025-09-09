@@ -16,15 +16,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookBrowseView = document.getElementById('book-browse-view');
     const backToBooksBtn = document.getElementById('back-to-books-btn');
     const downloadHistoryBtn = document.getElementById('download-history-btn');
+    const createExamBtn = document.getElementById('create-exam-btn');
+    const examWizardModal = document.getElementById('exam-wizard-modal');
+    const examWizardCloseBtn = document.getElementById('exam-wizard-close-btn');
+    const examWizardEntryView = document.getElementById('exam-wizard-entry-view');
+
+    // Fast Template Wizard Elements
+    const fastTemplateWizardView = document.getElementById('fast-template-wizard-view');
+    const fastTemplateCard = document.getElementById('fast-template-card');
+    const wizardBackBtn = document.getElementById('wizard-back-btn');
+    const fastBookSelect = document.getElementById('fast-book-select');
+    const fastSeasonsContainer = fastTemplateWizardView.querySelector('.mt-2.space-y-2');
+    const createFastTemplateBtn = fastTemplateWizardView.querySelector('button.px-6');
+
 
     const navLinks = {
         dashboard: document.getElementById('nav-dashboard'),
+        myExams: document.getElementById('nav-my-exams'),
         studyMode: document.getElementById('nav-study-mode'),
         settings: document.getElementById('nav-settings'),
     };
 
     const views = {
         dashboard: document.getElementById('dashboard-view'),
+        myExams: document.getElementById('my-exams-view'),
         studyMode: document.getElementById('study-mode-view'),
         settings: document.getElementById('settings-view'),
     };
@@ -38,7 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- View Switching ---
     function setActiveView(viewName) {
-        Object.values(views).forEach(view => view.classList.add('hidden'));
+        Object.values(views).forEach(view => {
+            if(view) view.classList.add('hidden');
+        });
         mainNav.querySelectorAll('a').forEach(link => link.classList.remove('bg-gray-700'));
         if (views[viewName]) views[viewName].classList.remove('hidden');
         if (navLinks[viewName]) navLinks[viewName].classList.add('bg-gray-700');
@@ -65,6 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveView('dashboard');
     });
 
+    navLinks.myExams.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveView('myExams');
+    });
+
     navLinks.studyMode.addEventListener('click', (e) => {
         e.preventDefault();
         setActiveView('studyMode');
@@ -76,6 +98,108 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         setActiveView('settings');
     });
+
+    // --- Exam Wizard Modal ---
+    function showExamWizard() {
+        examWizardEntryView.classList.remove('hidden');
+        fastTemplateWizardView.classList.add('hidden');
+        examWizardModal.classList.remove('hidden');
+    }
+
+    function hideExamWizard() {
+        examWizardModal.classList.add('hidden');
+    }
+
+    createExamBtn.addEventListener('click', showExamWizard);
+    examWizardCloseBtn.addEventListener('click', hideExamWizard);
+    wizardBackBtn.addEventListener('click', () => {
+        examWizardEntryView.classList.remove('hidden');
+        fastTemplateWizardView.classList.add('hidden');
+    });
+    fastTemplateCard.addEventListener('click', () => {
+        examWizardEntryView.classList.add('hidden');
+        fastTemplateWizardView.classList.remove('hidden');
+        initFastTemplateWizard();
+    });
+
+    // --- Fast Template Wizard Logic ---
+    function initFastTemplateWizard() {
+        // Populate book selection dropdown
+        if (booksManifest.length === 0) {
+            loadManifest().then(() => populateFastTemplateBookSelect());
+        } else {
+            populateFastTemplateBookSelect();
+        }
+    }
+
+    function populateFastTemplateBookSelect() {
+        fastBookSelect.innerHTML = '';
+        booksManifest.forEach(book => {
+            const option = document.createElement('option');
+            option.value = book.id;
+            option.textContent = book.title;
+            fastBookSelect.appendChild(option);
+        });
+        // Trigger change to load seasons for the first book
+        fastBookSelect.dispatchEvent(new Event('change'));
+    }
+
+    fastBookSelect.addEventListener('change', async (e) => {
+        const bookId = e.target.value;
+        fastSeasonsContainer.innerHTML = '<p class="text-xs text-gray-500">Loading seasons...</p>';
+        try {
+            const response = await fetch(`library/${bookId}/annotations.json`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const bookData = await response.json();
+
+            fastSeasonsContainer.innerHTML = '';
+            bookData.children.forEach(season => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'h-4 w-4 text-blue-600 border-gray-300 rounded';
+                checkbox.value = season.final_id;
+                const span = document.createElement('span');
+                span.className = 'ml-3 text-sm text-gray-700';
+                span.textContent = season.title;
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                fastSeasonsContainer.appendChild(label);
+            });
+        } catch (error) {
+            console.error(`Failed to load seasons for ${bookId}:`, error);
+            fastSeasonsContainer.innerHTML = '<p class="text-xs text-red-500">Could not load seasons.</p>';
+        }
+    });
+
+    createFastTemplateBtn.addEventListener('click', () => {
+        const selectedSeasons = Array.from(fastSeasonsContainer.querySelectorAll('input:checked'))
+                                     .map(cb => cb.value);
+
+        const templateConfig = {
+            type: 'Fast',
+            bookId: fastBookSelect.value,
+            seasons: selectedSeasons,
+            timingMode: document.getElementById('fast-timing-mode').value,
+            questionsPerSession: document.getElementById('fast-questions-per-session').value,
+            name: document.getElementById('fast-template-name').value,
+        };
+
+        if (!templateConfig.name) {
+            alert('Please enter a name for the template.');
+            return;
+        }
+        if (selectedSeasons.length === 0) {
+            alert('Please select at least one season.');
+            return;
+        }
+
+        console.log('Creating Fast Template with config:', templateConfig);
+        alert(`Template "${templateConfig.name}" created! (Check console for details)`);
+        hideExamWizard();
+    });
+
 
     // --- Data Loading & Display ---
     async function loadManifest() {
