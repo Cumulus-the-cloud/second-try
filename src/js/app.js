@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookListContainer = document.getElementById('book-list-container');
     const bookSelectionView = document.getElementById('book-selection-view');
     const bookBrowseView = document.getElementById('book-browse-view');
+    const backToBooksBtn = document.getElementById('back-to-books-btn');
 
     const navLinks = {
         dashboard: document.getElementById('nav-dashboard'),
@@ -40,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Study Mode Sub-views ---
     function showBookSelection() {
+        // Reset book state
+        currentBookData = null;
+        imageMap = {};
+        bookTocContainer.innerHTML = '';
+        questionArea.innerHTML = '<h1 class="text-2xl font-bold text-gray-800 mb-6">Select a chapter to begin</h1>';
+
         bookSelectionView.classList.remove('hidden');
         bookBrowseView.classList.add('hidden');
     }
@@ -98,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadBook(bookId) {
         try {
             bookTocContainer.innerHTML = '<p class="text-gray-500">Loading book...</p>';
-            questionArea.innerHTML = ''; // Clear previous questions
+            questionArea.innerHTML = '';
             showBookBrowse();
 
             const response = await fetch(`library/${bookId}/annotations.json`);
@@ -236,6 +243,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedNode && selectedNode.annotations) {
             displayStudyContent(selectedNode);
         }
+    });
+
+    backToBooksBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showBookSelection();
     });
 
     // --- Initialisation ---
