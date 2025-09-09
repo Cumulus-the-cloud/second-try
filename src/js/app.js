@@ -162,23 +162,40 @@ document.addEventListener('DOMContentLoaded', () => {
         header.textContent = chapterNode.title;
         questionArea.appendChild(header);
 
-        const questions = chapterNode.annotations.filter(ann => ann.type === 'Q');
-        if (questions.length === 0) {
+        // Group annotations by question number (NNN in the final_id)
+        const contentByQuestion = {};
+        if (chapterNode.annotations) {
+            chapterNode.annotations.forEach(ann => {
+                const qNum = ann.final_id.substring(7, 10);
+                if (!contentByQuestion[qNum]) {
+                    contentByQuestion[qNum] = { Q: null, E: [], F: [] };
+                }
+                if (ann.type === 'Q') contentByQuestion[qNum].Q = ann;
+                else if (ann.type === 'E') contentByQuestion[qNum].E.push(ann);
+                else if (ann.type === 'F') contentByQuestion[qNum].F.push(ann);
+            });
+        }
+
+        const questionKeys = Object.keys(contentByQuestion).filter(key => contentByQuestion[key].Q);
+
+        if (questionKeys.length === 0) {
             questionArea.innerHTML += '<p class="text-gray-500">No questions in this section.</p>';
             return;
         }
 
-        questions.forEach(question => {
+        questionKeys.forEach(qNum => {
+            const content = contentByQuestion[qNum];
+            const question = content.Q;
+
             const questionBlock = document.createElement('div');
             questionBlock.className = 'bg-white p-6 rounded-lg shadow-md mb-6';
             questionBlock.dataset.questionId = question.final_id;
             questionBlock.dataset.correctAnswer = question.correctAnswer;
 
-            const filename = `${question.final_id}.png`;
-            const imgSrc = imageMap[filename];
-            if (imgSrc) {
+            const qFilename = `${question.final_id}.png`;
+            if (imageMap[qFilename]) {
                 const img = document.createElement('img');
-                img.src = imgSrc;
+                img.src = imageMap[qFilename];
                 img.alt = `Question ${question.final_id}`;
                 img.className = 'w-full rounded-md';
                 questionBlock.appendChild(img);
@@ -201,8 +218,23 @@ document.addEventListener('DOMContentLoaded', () => {
             checkAnswerBtn.className = 'check-answer-btn px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition';
             checkAnswerBtn.textContent = 'Check Answer';
             optionsDiv.appendChild(checkAnswerBtn);
-
             questionBlock.appendChild(optionsDiv);
+
+            // Add hidden container for explanations
+            const explanationContainer = document.createElement('div');
+            explanationContainer.className = 'explanation-container hidden mt-4 border-t pt-4';
+            content.E.forEach(exp => {
+                const expFilename = `${exp.final_id}.png`;
+                if (imageMap[expFilename]) {
+                    const expImg = document.createElement('img');
+                    expImg.src = imageMap[expFilename];
+                    expImg.alt = `Explanation for ${question.final_id}`;
+                    expImg.className = 'w-full rounded-md mt-2';
+                    explanationContainer.appendChild(expImg);
+                }
+            });
+            questionBlock.appendChild(explanationContainer);
+
             questionArea.appendChild(questionBlock);
         });
     }
@@ -225,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (node.children) node.children.forEach(findNode);
         }
         findNode(currentBookData);
-        if (selectedNode && selectedNode.annotations) displayStudyContent(selectedNode);
+        if (selectedNode) displayStudyContent(selectedNode);
     });
 
     backToBooksBtn.addEventListener('click', (e) => {
@@ -235,42 +267,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     questionArea.addEventListener('click', e => {
         const questionBlock = e.target.closest('[data-question-id]');
-        if (!questionBlock) return;
+        if (!questionBlock || e.target.closest('.explanation-container')) return;
 
-        // Handle answer button clicks
         if (e.target.matches('.answer-btn')) {
-            // Clear previous selection
-            questionBlock.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-500', 'text-white');
-            });
-            // Mark new selection
+            questionBlock.querySelectorAll('.answer-btn').forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
             e.target.classList.add('bg-blue-500', 'text-white');
             questionBlock.dataset.selectedAnswer = e.target.dataset.answer;
         }
 
-        // Handle check answer button click
         if (e.target.matches('.check-answer-btn')) {
             const userAnswer = questionBlock.dataset.selectedAnswer;
             if (!userAnswer) {
                 alert('Please select an answer first.');
                 return;
             }
-
             const correctAnswer = questionBlock.dataset.correctAnswer;
             const questionId = questionBlock.dataset.questionId;
             const isCorrect = userAnswer === correctAnswer;
+            HistoryService.addStudyRecord({ questionId, userAnswer, correctAnswer, isCorrect });
 
-            HistoryService.addStudyRecord({
-                questionId,
-                userAnswer,
-                correctAnswer,
-                isCorrect,
-            });
-
-            // Provide visual feedback
             const allAnswerBtns = questionBlock.querySelectorAll('.answer-btn');
             allAnswerBtns.forEach(btn => {
-                btn.disabled = true; // Disable all buttons
+                btn.disabled = true;
                 const answer = btn.dataset.answer;
                 if (answer === correctAnswer) {
                     btn.classList.remove('bg-blue-500');
@@ -280,8 +298,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.classList.add('bg-red-500', 'text-white');
                 }
             });
-            e.target.disabled = true; // Disable the check button
+            e.target.disabled = true;
             e.target.textContent = isCorrect ? 'Correct!' : 'Incorrect';
+
+            const explanationContainer = questionBlock.querySelector('.explanation-container');
+            if (explanationContainer) explanationContainer.classList.remove('hidden');
         }
     });
 

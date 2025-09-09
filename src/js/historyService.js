@@ -1,9 +1,27 @@
-// A simple in-memory history service for now.
-// In the future, this could be backed by LocalStorage or a remote database.
+const HISTORY_STORAGE_KEY = 'medquest_study_history';
 
-const studyHistory = [];
+// Load initial history from LocalStorage
+let studyHistory = [];
+try {
+    const storedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+    if (storedHistory) {
+        studyHistory = JSON.parse(storedHistory);
+    }
+} catch (e) {
+    console.error("Could not load study history from LocalStorage", e);
+    studyHistory = [];
+}
+
 
 const HistoryService = {
+    _save: () => {
+        try {
+            localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(studyHistory));
+        } catch (e) {
+            console.error("Could not save study history to LocalStorage", e);
+        }
+    },
+
     /**
      * Adds a new study record to the history.
      * @param {object} record - The record to add.
@@ -19,7 +37,7 @@ const HistoryService = {
         };
         studyHistory.push(newRecord);
         console.log("Record added:", newRecord);
-        console.log("Current Study History:", studyHistory);
+        HistoryService._save(); // Save after adding a record
     },
 
     /**
