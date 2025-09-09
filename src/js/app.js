@@ -1,3 +1,5 @@
+import HistoryService from './historyService.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- App State ---
     let currentBookData = null;
@@ -41,12 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Study Mode Sub-views ---
     function showBookSelection() {
-        // Reset book state
         currentBookData = null;
         imageMap = {};
         bookTocContainer.innerHTML = '';
         questionArea.innerHTML = '<h1 class="text-2xl font-bold text-gray-800 mb-6">Select a chapter to begin</h1>';
-
         bookSelectionView.classList.remove('hidden');
         bookBrowseView.classList.add('hidden');
     }
@@ -66,9 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         setActiveView('studyMode');
         showBookSelection();
-        if (booksManifest.length === 0) {
-            loadManifest();
-        }
+        if (booksManifest.length === 0) loadManifest();
     });
 
     // --- Data Loading & Display ---
@@ -92,11 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer';
             card.dataset.id = book.id;
-
             const title = document.createElement('h3');
             title.className = 'text-xl font-bold mb-2';
             title.textContent = book.title;
-
             card.appendChild(title);
             bookListContainer.appendChild(card);
         });
@@ -107,13 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
             bookTocContainer.innerHTML = '<p class="text-gray-500">Loading book...</p>';
             questionArea.innerHTML = '';
             showBookBrowse();
-
             const response = await fetch(`library/${bookId}/annotations.json`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
             const bookData = await response.json();
             currentBookData = bookData;
-
             imageMap = {};
             function traverseAndMap(node) {
                 if (node.annotations) {
@@ -127,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (node.children) node.children.forEach(traverseAndMap);
             }
             traverseAndMap(bookData);
-
             renderToc(bookData, bookTocContainer);
         } catch (error) {
             console.error("Failed to load book:", error);
@@ -138,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderToc(rootNode, container) {
         container.innerHTML = '';
         const ul = document.createElement('ul');
-
         function buildToc(node, parentUl, level = 0) {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -147,16 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
             a.dataset.finalId = node.final_id;
             a.style.paddingLeft = `${level * 1.5}rem`;
             a.className = 'block p-2 rounded hover:bg-gray-200';
-
             if (node.annotations && node.annotations.some(ann => ann.type === 'Q')) {
                 a.classList.add('cursor-pointer');
             } else {
                 a.classList.add('font-bold', 'text-gray-500');
             }
-
             li.appendChild(a);
             parentUl.appendChild(li);
-
             if (node.children && node.children.length > 0) {
                 const childUl = document.createElement('ul');
                 li.appendChild(childUl);
@@ -183,10 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
         questions.forEach(question => {
             const questionBlock = document.createElement('div');
             questionBlock.className = 'bg-white p-6 rounded-lg shadow-md mb-6';
+            questionBlock.dataset.questionId = question.final_id;
+            questionBlock.dataset.correctAnswer = question.correctAnswer;
 
             const filename = `${question.final_id}.png`;
             const imgSrc = imageMap[filename];
-
             if (imgSrc) {
                 const img = document.createElement('img');
                 img.src = imgSrc;
@@ -197,21 +186,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'mt-4 flex items-center justify-between';
-
             const answerButtons = document.createElement('div');
             answerButtons.className = 'flex space-x-2';
             for (let i = 1; i <= 4; i++) {
                 const button = document.createElement('button');
-                button.className = 'px-4 py-2 bg-gray-200 rounded hover:bg-blue-500 hover:text-white transition';
+                button.className = 'answer-btn px-4 py-2 bg-gray-200 rounded hover:bg-blue-500 hover:text-white transition';
                 button.textContent = `${i}`;
+                button.dataset.answer = i;
                 answerButtons.appendChild(button);
             }
             optionsDiv.appendChild(answerButtons);
 
-            const showAnswerBtn = document.createElement('button');
-            showAnswerBtn.className = 'px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition';
-            showAnswerBtn.textContent = 'Show Answer';
-            optionsDiv.appendChild(showAnswerBtn);
+            const checkAnswerBtn = document.createElement('button');
+            checkAnswerBtn.className = 'check-answer-btn px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition';
+            checkAnswerBtn.textContent = 'Check Answer';
+            optionsDiv.appendChild(checkAnswerBtn);
 
             questionBlock.appendChild(optionsDiv);
             questionArea.appendChild(questionBlock);
@@ -221,16 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners ---
     bookListContainer.addEventListener('click', e => {
         const card = e.target.closest('[data-id]');
-        if (card) {
-            loadBook(card.dataset.id);
-        }
+        if (card) loadBook(card.dataset.id);
     });
 
     bookTocContainer.addEventListener('click', e => {
         e.preventDefault();
         const link = e.target.closest('a');
         if (!link || !link.dataset.finalId) return;
-
         const finalId = link.dataset.finalId;
         let selectedNode = null;
         function findNode(node) {
@@ -239,15 +225,64 @@ document.addEventListener('DOMContentLoaded', () => {
             if (node.children) node.children.forEach(findNode);
         }
         findNode(currentBookData);
-
-        if (selectedNode && selectedNode.annotations) {
-            displayStudyContent(selectedNode);
-        }
+        if (selectedNode && selectedNode.annotations) displayStudyContent(selectedNode);
     });
 
     backToBooksBtn.addEventListener('click', (e) => {
         e.preventDefault();
         showBookSelection();
+    });
+
+    questionArea.addEventListener('click', e => {
+        const questionBlock = e.target.closest('[data-question-id]');
+        if (!questionBlock) return;
+
+        // Handle answer button clicks
+        if (e.target.matches('.answer-btn')) {
+            // Clear previous selection
+            questionBlock.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+            });
+            // Mark new selection
+            e.target.classList.add('bg-blue-500', 'text-white');
+            questionBlock.dataset.selectedAnswer = e.target.dataset.answer;
+        }
+
+        // Handle check answer button click
+        if (e.target.matches('.check-answer-btn')) {
+            const userAnswer = questionBlock.dataset.selectedAnswer;
+            if (!userAnswer) {
+                alert('Please select an answer first.');
+                return;
+            }
+
+            const correctAnswer = questionBlock.dataset.correctAnswer;
+            const questionId = questionBlock.dataset.questionId;
+            const isCorrect = userAnswer === correctAnswer;
+
+            HistoryService.addStudyRecord({
+                questionId,
+                userAnswer,
+                correctAnswer,
+                isCorrect,
+            });
+
+            // Provide visual feedback
+            const allAnswerBtns = questionBlock.querySelectorAll('.answer-btn');
+            allAnswerBtns.forEach(btn => {
+                btn.disabled = true; // Disable all buttons
+                const answer = btn.dataset.answer;
+                if (answer === correctAnswer) {
+                    btn.classList.remove('bg-blue-500');
+                    btn.classList.add('bg-green-500', 'text-white');
+                } else if (answer === userAnswer) {
+                    btn.classList.remove('bg-blue-500');
+                    btn.classList.add('bg-red-500', 'text-white');
+                }
+            });
+            e.target.disabled = true; // Disable the check button
+            e.target.textContent = isCorrect ? 'Correct!' : 'Incorrect';
+        }
     });
 
     // --- Initialisation ---
