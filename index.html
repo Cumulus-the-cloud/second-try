@@ -185,21 +185,31 @@
             </div>
 
             <div id="study-mode-view" class="hidden h-full">
-                <!-- New Study Mode UI -->
-                <div class="flex h-full">
-                    <!-- Book content sidebar -->
-                    <aside id="book-sidebar" class="w-1/3 bg-white p-6 rounded-lg shadow-md overflow-y-auto mr-8">
-                        <h2 class="text-xl font-bold mb-4">Book Contents</h2>
-                        <div id="book-toc">
-                            <!-- Table of contents will be dynamically inserted here -->
-                            <p class="text-gray-500">Loading book...</p>
-                        </div>
-                    </aside>
-                    <!-- Question display area -->
-                    <section id="question-area" class="flex-1">
-                        <h1 class="text-2xl font-bold text-gray-800 mb-6">Select a chapter to begin</h1>
-                        <!-- Questions will be dynamically inserted here -->
-                    </section>
+                <!-- 1. Book Selection View -->
+                <div id="book-selection-view">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Choose a Book to Study</h1>
+                    <div id="book-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Book cards will be dynamically inserted here -->
+                        <p class="text-gray-500">Loading books...</p>
+                    </div>
+                </div>
+
+                <!-- 2. Book Browse View -->
+                <div id="book-browse-view" class="hidden h-full">
+                    <div class="flex h-full">
+                        <!-- Book content sidebar -->
+                        <aside id="book-sidebar" class="w-1/3 bg-white p-6 rounded-lg shadow-md overflow-y-auto mr-8">
+                            <h2 class="text-xl font-bold mb-4">Book Contents</h2>
+                            <div id="book-toc">
+                                <!-- Table of contents will be dynamically inserted here -->
+                            </div>
+                        </aside>
+                        <!-- Question display area -->
+                        <section id="question-area" class="flex-1">
+                            <h1 class="text-2xl font-bold text-gray-800 mb-6">Select a chapter to begin</h1>
+                            <!-- Questions will be dynamically inserted here -->
+                        </section>
+                    </div>
                 </div>
             </div>
         </main>

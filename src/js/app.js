@@ -2,12 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- App State ---
     let currentBookData = null;
     let imageMap = {};
+    let booksManifest = [];
 
     // --- DOM Elements ---
     const dateElement = document.getElementById('current-date');
     const mainNav = document.getElementById('main-nav');
     const bookTocContainer = document.getElementById('book-toc');
     const questionArea = document.getElementById('question-area');
+    const bookListContainer = document.getElementById('book-list-container');
+    const bookSelectionView = document.getElementById('book-selection-view');
+    const bookBrowseView = document.getElementById('book-browse-view');
 
     const navLinks = {
         dashboard: document.getElementById('nav-dashboard'),
@@ -30,11 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function setActiveView(viewName) {
         Object.values(views).forEach(view => view.classList.add('hidden'));
         mainNav.querySelectorAll('a').forEach(link => link.classList.remove('bg-gray-700'));
-
         if (views[viewName]) views[viewName].classList.remove('hidden');
         if (navLinks[viewName]) navLinks[viewName].classList.add('bg-gray-700');
     }
 
+    // --- Study Mode Sub-views ---
+    function showBookSelection() {
+        bookSelectionView.classList.remove('hidden');
+        bookBrowseView.classList.add('hidden');
+    }
+
+    function showBookBrowse() {
+        bookSelectionView.classList.add('hidden');
+        bookBrowseView.classList.remove('hidden');
+    }
+
+    // --- Navigation ---
     navLinks.dashboard.addEventListener('click', (e) => {
         e.preventDefault();
         setActiveView('dashboard');
@@ -43,13 +58,49 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.studyMode.addEventListener('click', (e) => {
         e.preventDefault();
         setActiveView('studyMode');
-        if (!currentBookData) loadBook('gastroenterology');
+        showBookSelection();
+        if (booksManifest.length === 0) {
+            loadManifest();
+        }
     });
 
-    // --- Data Loading ---
+    // --- Data Loading & Display ---
+    async function loadManifest() {
+        try {
+            bookListContainer.innerHTML = '<p class="text-gray-500">Loading books...</p>';
+            const response = await fetch('library/manifest.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const manifest = await response.json();
+            booksManifest = manifest.books;
+            renderBookSelection();
+        } catch (error) {
+            console.error('Failed to load manifest:', error);
+            bookListContainer.innerHTML = '<p class="text-red-500">Could not load books.</p>';
+        }
+    }
+
+    function renderBookSelection() {
+        bookListContainer.innerHTML = '';
+        booksManifest.forEach(book => {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer';
+            card.dataset.id = book.id;
+
+            const title = document.createElement('h3');
+            title.className = 'text-xl font-bold mb-2';
+            title.textContent = book.title;
+
+            card.appendChild(title);
+            bookListContainer.appendChild(card);
+        });
+    }
+
     async function loadBook(bookId) {
         try {
             bookTocContainer.innerHTML = '<p class="text-gray-500">Loading book...</p>';
+            questionArea.innerHTML = ''; // Clear previous questions
+            showBookBrowse();
+
             const response = await fetch(`library/${bookId}/annotations.json`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
@@ -71,16 +122,14 @@ document.addEventListener('DOMContentLoaded', () => {
             traverseAndMap(bookData);
 
             renderToc(bookData, bookTocContainer);
-
         } catch (error) {
             console.error("Failed to load book:", error);
-            bookTocContainer.innerHTML = '<p class="text-red-500">Failed to load book. See console for details.</p>';
+            bookTocContainer.innerHTML = `<p class="text-red-500">Failed to load ${bookId}.</p>`;
         }
     }
 
-    // --- Display Logic ---
     function renderToc(rootNode, container) {
-        container.innerHTML = ''; // Clear previous TOC
+        container.innerHTML = '';
         const ul = document.createElement('ul');
 
         function buildToc(node, parentUl, level = 0) {
@@ -163,6 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Listeners ---
+    bookListContainer.addEventListener('click', e => {
+        const card = e.target.closest('[data-id]');
+        if (card) {
+            loadBook(card.dataset.id);
+        }
+    });
+
     bookTocContainer.addEventListener('click', e => {
         e.preventDefault();
         const link = e.target.closest('a');
@@ -172,10 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let selectedNode = null;
         function findNode(node) {
             if (selectedNode) return;
-            if (node.final_id === finalId) {
-                selectedNode = node;
-                return;
-            }
+            if (node.final_id === finalId) selectedNode = node;
             if (node.children) node.children.forEach(findNode);
         }
         findNode(currentBookData);

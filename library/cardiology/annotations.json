@@ -1,0 +1,21 @@
+{
+  "title": "Cardiology",
+  "final_id": "10200000000",
+  "children": [
+    {
+      "title": "1- Basic ECG",
+      "final_id": "10201000000",
+      "children": [
+        {
+          "title": "1) Rate and Rhythm",
+          "final_id": "10201010000",
+          "annotations": [
+            { "type": "Q", "final_id": "20201010010", "correctAnswer": "2" },
+            { "type": "E", "final_id": "30201010011" },
+            { "type": "Q", "final_id": "20201010020", "correctAnswer": "4" }
+          ]
+        }
+      ]
+    }
+  ]
+}
