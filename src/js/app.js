@@ -15,15 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookSelectionView = document.getElementById('book-selection-view');
     const bookBrowseView = document.getElementById('book-browse-view');
     const backToBooksBtn = document.getElementById('back-to-books-btn');
+    const downloadHistoryBtn = document.getElementById('download-history-btn');
 
     const navLinks = {
         dashboard: document.getElementById('nav-dashboard'),
         studyMode: document.getElementById('nav-study-mode'),
+        settings: document.getElementById('nav-settings'),
     };
 
     const views = {
         dashboard: document.getElementById('dashboard-view'),
         studyMode: document.getElementById('study-mode-view'),
+        settings: document.getElementById('settings-view'),
     };
 
     // --- Date Logic ---
@@ -67,6 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveView('studyMode');
         showBookSelection();
         if (booksManifest.length === 0) loadManifest();
+    });
+
+    navLinks.settings.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveView('settings');
     });
 
     // --- Data Loading & Display ---
@@ -263,6 +271,21 @@ document.addEventListener('DOMContentLoaded', () => {
     backToBooksBtn.addEventListener('click', (e) => {
         e.preventDefault();
         showBookSelection();
+    });
+
+    downloadHistoryBtn.addEventListener('click', () => {
+        const history = HistoryService.getStudyHistory();
+        if (history.length === 0) {
+            alert("No history to download.");
+            return;
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "medquest_history.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     });
 
     questionArea.addEventListener('click', e => {
