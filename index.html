@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedQuest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-800 text-white flex flex-col">
+            <div class="h-20 flex items-center justify-center">
+                <i class="fas fa-book-medical fa-2x mr-2"></i>
+                <span class="text-2xl font-bold">MedQuest</span>
+            </div>
+            <nav class="flex-1 px-4 py-8 space-y-4">
+                <a href="#" class="flex items-center px-4 py-2 text-lg font-semibold bg-gray-700 rounded-lg">
+                    <i class="fas fa-tachometer-alt w-6 h-6 mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded-lg">
+                    <i class="fas fa-file-alt w-6 h-6 mr-3"></i>
+                    <span>My exams</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded-lg">
+                    <i class="fas fa-book-open w-6 h-6 mr-3"></i>
+                    <span>Study Mode</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded-lg">
+                    <i class="fas fa-calendar-alt w-6 h-6 mr-3"></i>
+                    <span>Schedule</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded-lg">
+                    <i class="fas fa-chart-line w-6 h-6 mr-3"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded-lg">
+                    <i class="fas fa-cog w-6 h-6 mr-3"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-10 overflow-y-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+                    <p class="text-gray-500" id="current-date">Monday, 24 July 2024</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-bell fa-lg text-gray-600"></i>
+                    <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Gadgets Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Study Streak -->
+                <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <div class="bg-orange-100 p-3 rounded-full">
+                        <i class="fas fa-fire fa-2x text-orange-500"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Study Streak</p>
+                        <p class="text-2xl font-bold">12 days</p>
+                    </div>
+                </div>
+                <!-- Today's Exams -->
+                <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-file-alt fa-2x text-blue-500"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Today's Exams</p>
+                        <p class="text-2xl font-bold">3</p>
+                    </div>
+                </div>
+                <!-- Missed This Week -->
+                <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-times-circle fa-2x text-red-500"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Missed This Week</p>
+                        <p class="text-2xl font-bold">5</p>
+                    </div>
+                </div>
+                <!-- Performance -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-gray-500">Performance</p>
+                        <div class="text-sm">
+                            <button class="font-bold text-blue-600">Day</button>
+                            <button class="text-gray-400">Week</button>
+                            <button class="text-gray-400">Month</button>
+                        </div>
+                    </div>
+                    <p class="text-2xl font-bold">85%</p>
+                </div>
+            </div>
+
+            <!-- Today's & Missed Items -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Today's Exams and Tasks -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">Today's Exams and Tasks</h2>
+                    <div class="space-y-4">
+                        <!-- Exam Item -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <h3 class="font-bold">Cardiology Exam - Session 1</h3>
+                                <p class="text-sm text-gray-500">25 Questions | 25 mins | 88%</p>
+                            </div>
+                            <button class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold">Review</button>
+                        </div>
+                        <!-- Task Item -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <h3 class="font-bold">Gastroenterology Practice</h3>
+                                <p class="text-sm text-gray-500">50 Questions | 50 mins</p>
+                            </div>
+                            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600">Start</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Missed This Week -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">Missed This Week</h2>
+                    <div class="space-y-4">
+                        <a href="#" class="block p-4 bg-red-50 rounded-lg hover:bg-red-100">
+                            <h3 class="font-bold">Neurology Exam - Session 3</h3>
+                            <p class="text-sm text-gray-500">25 Questions | 25 mins</p>
+                        </a>
+                        <a href="#" class="block p-4 bg-red-50 rounded-lg hover:bg-red-100">
+                            <h3 class="font-bold">Endocrinology Practice</h3>
+                            <p class="text-sm text-gray-500">30 Questions | 30 mins</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Subjects Pie Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">Exams of the Week by Subject</h2>
+                    <div class="flex justify-center items-center h-48">
+                        <p class="text-gray-400">Pie chart placeholder</p>
+                    </div>
+                </div>
+                <!-- Weekly Calendar -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">This Week's Schedule</h2>
+                    <div class="grid grid-cols-7 gap-2 text-center">
+                        <!-- Day -->
+                        <div class="bg-gray-50 p-2 rounded-lg">
+                            <p class="font-bold">Mon</p>
+                            <div class="space-y-1 mt-2 text-xs">
+                                <div class="bg-blue-100 text-blue-800 p-1 rounded">Cardiology S1</div>
+                                <div class="bg-green-100 text-green-800 p-1 rounded">Task A</div>
+                            </div>
+                        </div>
+                        <!-- Day -->
+                        <div class="bg-gray-50 p-2 rounded-lg">
+                            <p class="font-bold">Tue</p>
+                            <div class="space-y-1 mt-2 text-xs">
+                                <div class="bg-blue-100 text-blue-800 p-1 rounded">Cardiology S2</div>
+                            </div>
+                        </div>
+                        <!-- Other days placeholders -->
+                        <div class="bg-gray-50 p-2 rounded-lg"><p class="font-bold">Wed</p></div>
+                        <div class="bg-gray-50 p-2 rounded-lg"><p class="font-bold">Thu</p></div>
+                        <div class="bg-gray-50 p-2 rounded-lg"><p class="font-bold">Fri</p></div>
+                        <div class="bg-gray-50 p-2 rounded-lg"><p class="font-bold">Sat</p></div>
+                        <div class="bg-gray-50 p-2 rounded-lg"><p class="font-bold">Sun</p></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="src/js/app.js"></script>
+</body>
+</html>
